@@ -84,7 +84,6 @@ def run_python(code: str) -> dict[str, Any]:
                 timeout=settings.exec_timeout_s,
                 capture_output=True,
                 text=True,
-                preexec_fn=_limit_resources if os.name == "posix" else None,
             )
             status_s = "ok" if result.returncode == 0 else "error"
             stdout = (result.stdout or "")[-50_000:]
