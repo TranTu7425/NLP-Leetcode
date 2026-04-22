@@ -1,0 +1,37 @@
+services:
+  api:
+    build:
+      context: ./backend
+    container_name: nlp-leetcode-api
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-please-change-me}
+      DATABASE_URL: sqlite:////app/data/nlp.db
+      EXEC_TIMEOUT_S: ${EXEC_TIMEOUT_S:-10}
+      EXEC_MEM_MB: ${EXEC_MEM_MB:-512}
+    volumes:
+      - api-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  web:
+    build:
+      context: ./frontend
+    container_name: nlp-leetcode-web
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  api-data:
